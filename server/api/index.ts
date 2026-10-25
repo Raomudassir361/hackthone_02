@@ -17,16 +17,14 @@ let dbConnected = false;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!dbConnected) {
-    await connectDB();
-    dbConnected = true;
+    try {
+      await connectDB();
+      dbConnected = true;
+    } catch (e) {
+      console.error('DB connection error in handler:', e);
+    }
   }
-
-  // Delegate to Express
-  return new Promise<void>((resolve, reject) => {
-    // @ts-expect-error – Express handler signature is compatible with Vercel req/res
-    app(req, res, (err: unknown) => {
-      if (err) reject(err);
-      else resolve();
-    });
-  });
+  // Directly delegate to Express – it will handle the response and end it.
+  // No need for a custom Promise wrapper.
+  app(req, res);
 }
