@@ -21,16 +21,24 @@ export function createApp(): Express {
   // Security & headers
   app.use(helmet());
 
-  // CORS
+  // CORS — allow configured origins + any vercel.app subdomain + localhost
   const allowedOrigins = env.CLIENT_URL.split(',').map((origin) => origin.trim());
   app.use(
     cors({
       origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
-          callback(null, true);
-        } else {
-          callback(new Error('Not allowed by CORS'));
+        // Always allow requests with no origin (e.g., server-to-server, Postman)
+        if (!origin) return callback(null, true);
+        // Allow wildcard
+        if (allowedOrigins.includes('*')) return callback(null, true);
+        // Allow explicitly listed origins
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        // Allow any *.vercel.app domain (covers all preview deployments)
+        if (origin.endsWith('.vercel.app')) return callback(null, true);
+        // Allow localhost in any port (for local dev)
+        if (origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1')) {
+          return callback(null, true);
         }
+        callback(new Error('Not allowed by CORS'));
       },
       credentials: true,
     })
