@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.usersRouter = void 0;
+const express_1 = require("express");
+const users_controller_js_1 = require("./users.controller.js");
+const auth_js_1 = require("../../middleware/auth.js");
+const validate_js_1 = require("../../middleware/validate.js");
+const users_schema_js_1 = require("./users.schema.js");
+exports.usersRouter = (0, express_1.Router)();
+exports.usersRouter.use(auth_js_1.authenticate);
+exports.usersRouter.use(auth_js_1.mustChangePasswordGuard);
+exports.usersRouter.use((0, auth_js_1.requireRole)(['admin']));
+exports.usersRouter.get('/', users_controller_js_1.UsersController.getUsers);
+exports.usersRouter.post('/hr', (0, validate_js_1.validate)(users_schema_js_1.createHrSchema), users_controller_js_1.UsersController.createHr);
+exports.usersRouter.patch('/:id/deactivate', users_controller_js_1.UsersController.toggleDeactivate);
+exports.usersRouter.post('/:id/reset-password', (0, validate_js_1.validate)(users_schema_js_1.resetPasswordSchema), users_controller_js_1.UsersController.resetPassword);
