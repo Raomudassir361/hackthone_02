@@ -1,4 +1,8 @@
-export const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+export const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:5000/api'
+    : 'https://hackthone-02-server.vercel.app/api');
 
 export interface ApiResponse<T = unknown> {
   data?: T;

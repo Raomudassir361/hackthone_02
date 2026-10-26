@@ -6,6 +6,7 @@
  * The DB connection is cached between warm invocations to avoid reconnect overhead.
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import mongoose from 'mongoose';
 import { createApp } from '../src/app.js';
 import { connectDB } from '../src/config/db.js';
 
@@ -16,9 +17,21 @@ const app = createApp();
 let dbConnected = false;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (!dbConnected) {
-    await connectDB();
-    dbConnected = true;
+  if (!dbConnected || mongoose.connection.readyState !== 1) {
+    const conn = await connectDB();
+    if (conn && mongoose.connection.readyState === 1) {
+      dbConnected = true;
+    }
+  }
+
+  // If MongoDB is not connected on Vercel, return clear error instead of letting Mongoose timeout
+  if (mongoose.connection.readyState !== 1 && req.url !== '/api/health' && req.url !== '/api') {
+    return res.status(503).json({
+      error: {
+        code: 'DATABASE_UNAVAILABLE',
+        message: 'Database connection failed. Please ensure MONGODB_URI is configured in Vercel environment variables and Atlas allows 0.0.0.0/0 IP access.',
+      },
+    });
   }
 
   // Delegate to Express

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { apiFetch } from '../../lib/api';
+import { apiFetch, API_BASE } from '../../lib/api';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { DataTable } from '../../components/ui/DataTable';
@@ -157,7 +157,7 @@ export function EmployeesScreen() {
 
   const handleExportCsv = () => {
     const token = localStorage.getItem('hcm_token');
-    const url = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/employees/export`;
+    const url = `${API_BASE}/employees/export`;
     fetch(url, {
       headers: { Authorization: `Bearer ${token}` },
     })
