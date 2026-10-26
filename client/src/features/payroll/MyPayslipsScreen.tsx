@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { apiFetch } from '../../lib/api';
+import { apiFetch, API_BASE } from '../../lib/api';
 import { useAuth } from '../../context/AuthContextCore';
 import { useToast } from '../../components/ui/ToastContext';
 import { Card, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
@@ -43,7 +43,7 @@ export function MyPayslipsScreen() {
   const handleDownloadPdf = async (id: string, month: string) => {
     try {
       const token = localStorage.getItem('hcm_token');
-      const res = await fetch(`http://localhost:5000/api/payslips/${id}/pdf`, {
+      const res = await fetch(`${API_BASE}/payslips/${id}/pdf`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
