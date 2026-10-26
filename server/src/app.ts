@@ -19,7 +19,11 @@ export function createApp(): Express {
   const app = express();
 
   // Security & headers
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+    })
+  );
 
   // CORS — allow configured origins + any vercel.app subdomain + localhost
   const allowedOrigins = env.CLIENT_URL.split(',').map((origin) => origin.trim());
@@ -56,6 +60,21 @@ export function createApp(): Express {
     legacyHeaders: false,
   });
   app.use(limiter);
+
+  // Root API route
+  app.get('/api', (_req, res) => {
+    res.status(200).json({
+      name: 'HCM Lite API',
+      status: 'online',
+      version: '1.0.0',
+      health: '/api/health',
+    });
+  });
+
+  // Ignore favicon requests for backend API
+  app.get('/favicon.ico', (_req, res) => {
+    res.status(204).end();
+  });
 
   // Health route
   app.get('/api/health', (_req, res) => {

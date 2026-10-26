@@ -2,11 +2,11 @@
   "name": "hcm-lite-server",
   "version": "1.0.0",
   "description": "HCM Lite Backend API",
-  "main": "dist/server.js",
+  "main": "dist/src/server.js",
   "scripts": {
     "dev": "npx tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node dist/src/server.js",
     "lint": "eslint src/ --ext .ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
